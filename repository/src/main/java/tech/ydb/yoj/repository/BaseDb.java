@@ -11,4 +11,8 @@ public interface BaseDb {
     }
 
     <T extends Entity<T>> Table<T> table(Class<T> c);
+
+    default <T extends Entity<T>> Table<T> table(Class<T> c, String name) {
+        return table(c);
+    }
 }
