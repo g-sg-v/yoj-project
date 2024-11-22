@@ -26,6 +26,10 @@ public abstract class AbstractDelegatingTable<T extends Entity<T>> implements Ta
         this.target = BaseDb.current(BaseDb.class).table(resolveEntityType());
     }
 
+    protected AbstractDelegatingTable(String tableName) {
+        this.target = BaseDb.current(BaseDb.class).table(resolveEntityType(), tableName);
+    }
+
     @SuppressWarnings("unchecked")
     private Class<T> resolveEntityType() {
         return (Class<T>) (new TypeToken<T>(getClass()) {

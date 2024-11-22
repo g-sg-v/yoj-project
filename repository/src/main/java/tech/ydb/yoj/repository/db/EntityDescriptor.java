@@ -5,7 +5,7 @@ import tech.ydb.yoj.databind.schema.Schema;
 import javax.annotation.Nullable;
 
 public record EntityDescriptor<E extends Entity<E>>(Class<E> clazz, @Nullable String tableName) {
-    public String getTableName(Schema<E> schema) {
+    public String getTableName(Schema<?> schema) {
         return tableName != null ? tableName : schema.getName();
     }
 

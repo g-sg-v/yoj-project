@@ -5,6 +5,7 @@ import com.google.common.collect.Sets;
 import com.google.common.reflect.TypeToken;
 import lombok.Getter;
 import lombok.NonNull;
+import tech.ydb.yoj.DeprecationWarnings;
 import tech.ydb.yoj.databind.expression.FilterExpression;
 import tech.ydb.yoj.databind.expression.OrderExpression;
 import tech.ydb.yoj.repository.db.Entity;
@@ -42,6 +43,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -55,7 +57,15 @@ import static java.util.stream.Stream.concat;
 import static tech.ydb.yoj.repository.db.EntityExpressions.defaultOrder;
 
 public class YdbTable<T extends Entity<T>> implements Table<T> {
-    private static final Boolean OLD_STATEMENT_FACTORY = Boolean.getBoolean("use.type.statement.factory");
+    private static final AtomicBoolean useOldStatementFactory = new AtomicBoolean(Boolean.getBoolean("yoj.use.type.statement.factory"));
+
+    @Deprecated(forRemoval = true)
+    public static void setUseOldStatementFactory(boolean value) {
+        DeprecationWarnings.warnOnce("YdbTable.setUseOldStatementFactory(boolean)",
+                "You are using YdbTable.setUseOldStatementFactory(boolean) which is deprecated for removal in YOJ 3.0.0. Please stop calling this method");
+        useOldStatementFactory.set(value);
+    }
+
     private final QueryExecutor executor;
     @Getter
     private final EntityDescriptor<T> descriptor;
@@ -64,7 +74,7 @@ public class YdbTable<T extends Entity<T>> implements Table<T> {
     public YdbTable(Class<T> type, QueryExecutor executor) {
         this.descriptor = EntityDescriptor.of(type);
         this.executor = new CheckingQueryExecutor(executor);
-        this.statementFactory = OLD_STATEMENT_FACTORY ? new YqlStatementFactory.Type<>() : new YqlStatementFactory.Descriptor<>();
+        this.statementFactory = useOldStatementFactory.get() ? new YqlStatementFactory.Type<>() : new YqlStatementFactory.Descriptor<>();
     }
 
     public YdbTable(EntityDescriptor<T> descriptor, QueryExecutor executor) {
@@ -76,7 +86,7 @@ public class YdbTable<T extends Entity<T>> implements Table<T> {
     protected YdbTable(QueryExecutor executor) {
         this.executor = new CheckingQueryExecutor(executor);
         this.descriptor = EntityDescriptor.of(resolveEntityType());
-        this.statementFactory = OLD_STATEMENT_FACTORY ? new YqlStatementFactory.Type<>() : new YqlStatementFactory.Descriptor<>();
+        this.statementFactory = useOldStatementFactory.get() ? new YqlStatementFactory.Type<>() : new YqlStatementFactory.Descriptor<>();
     }
 
     @SuppressWarnings("unchecked")
