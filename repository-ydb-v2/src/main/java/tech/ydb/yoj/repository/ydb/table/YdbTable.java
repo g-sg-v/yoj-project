@@ -562,6 +562,6 @@ public class YdbTable<T extends Entity<T>> implements Table<T> {
     public <ID extends Id<T>> void updateIn(Collection<ID> ids, Changeset changeset) {
         var params = new UpdateInStatement.UpdateInStatementInput<>(ids, changeset.toMap());
         EntitySchema<T> entitySchema = EntitySchema.of(descriptor.clazz());
-        executor.pendingExecute(new UpdateInStatement<>(entitySchema, entitySchema, params, descriptor.tableName()), params);
+        executor.pendingExecute(new UpdateInStatement<>(entitySchema, entitySchema, params, descriptor.getTableName(entitySchema)), params);
     }
 }
