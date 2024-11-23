@@ -126,6 +126,7 @@ public class YdbRepositoryTransaction<REPO extends YdbRepository>
      * versions
      */
     @Override
+    @ExperimentalApi(issue="https://github.com/ydb-platform/yoj-project/issues/32")
     public <T extends Entity<T>> Table<T> table(@NonNull Class<T> clazz, @NonNull String tableName) {
         return new YdbTable<>(new EntityDescriptor<>(clazz, tableName), this);
     }

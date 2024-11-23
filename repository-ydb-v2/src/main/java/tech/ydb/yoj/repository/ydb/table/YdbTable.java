@@ -59,6 +59,9 @@ import static tech.ydb.yoj.repository.db.EntityExpressions.defaultOrder;
 public class YdbTable<T extends Entity<T>> implements Table<T> {
     private static final AtomicBoolean useOldStatementFactory = new AtomicBoolean(Boolean.getBoolean("yoj.use.type.statement.factory"));
 
+    /**
+     * @deprecated This method will be removed in YOJ 3.0.0. There is no alternative, just stop calling it.
+     */
     @Deprecated(forRemoval = true)
     public static void setUseOldStatementFactory(boolean value) {
         DeprecationWarnings.warnOnce("YdbTable.setUseOldStatementFactory(boolean)",
