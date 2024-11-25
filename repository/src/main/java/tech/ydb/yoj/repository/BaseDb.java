@@ -13,7 +13,7 @@ public interface BaseDb {
 
     <T extends Entity<T>> Table<T> table(Class<T> c);
 
-    @ExperimentalApi(issue="https://github.com/ydb-platform/yoj-project/issues/32")
+    @ExperimentalApi(issue = "https://github.com/ydb-platform/yoj-project/issues/32")
     default <T extends Entity<T>> Table<T> table(Class<T> c, String name) {
         return table(c);
     }
