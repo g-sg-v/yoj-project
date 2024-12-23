@@ -43,7 +43,7 @@ import static java.util.stream.Collectors.toSet;
 public final class YdbSchemaCompatibilityChecker {
     private static final Logger log = LoggerFactory.getLogger(YdbSchemaCompatibilityChecker.class);
 
-    private final List<TableDescriptor<? extends Entity>> entities;
+    private final List<TableDescriptor<? extends Entity>> descriptors;
     private final Config config;
     private final YdbRepository repository;
     private final YdbConfig repositoryConfig;
@@ -52,8 +52,8 @@ public final class YdbSchemaCompatibilityChecker {
     private final List<String> canExecuteMessages = new ArrayList<>();
     private final List<String> incompatibleMessages = new ArrayList<>();
 
-    public YdbSchemaCompatibilityChecker(YdbRepository repository, List<TableDescriptor<? extends Entity>> entities) {
-        this(repository, entities, Config.DEFAULT);
+    public YdbSchemaCompatibilityChecker(YdbRepository repository, List<TableDescriptor<? extends Entity>> descriptors) {
+        this(repository, descriptors, Config.DEFAULT);
     }
 
     public YdbSchemaCompatibilityChecker(List<Class<? extends Entity>> entities, YdbRepository repository) {
@@ -64,8 +64,8 @@ public final class YdbSchemaCompatibilityChecker {
         this(repository, toDescriptors(entities), config);
     }
 
-    public YdbSchemaCompatibilityChecker(YdbRepository repository, List<TableDescriptor<? extends Entity>> entities, Config config) {
-        this.entities = entities;
+    public YdbSchemaCompatibilityChecker(YdbRepository repository, List<TableDescriptor<? extends Entity>> descriptors, Config config) {
+        this.descriptors = descriptors;
         this.config = config;
         this.repository = repository;
         this.repositoryConfig = this.repository.getConfig();
@@ -156,7 +156,7 @@ public final class YdbSchemaCompatibilityChecker {
 
     @SneakyThrows
     private Map<String, YdbSchemaOperations.Table> generateSchemeFromCode() {
-        return entities.stream()
+        return descriptors.stream()
                 .map(this::tableForEntity)
                 .collect(toMap(YdbSchemaOperations.Table::getName, Function.identity()));
     }
