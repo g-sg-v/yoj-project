@@ -36,6 +36,7 @@ import tech.ydb.yoj.repository.db.Entity;
 import tech.ydb.yoj.repository.db.IsolationLevel;
 import tech.ydb.yoj.repository.db.RepositoryTransaction;
 import tech.ydb.yoj.repository.db.Table;
+import tech.ydb.yoj.repository.db.TableDescriptor;
 import tech.ydb.yoj.repository.db.TxOptions;
 import tech.ydb.yoj.repository.db.bulk.BulkParams;
 import tech.ydb.yoj.repository.db.cache.RepositoryCache;
@@ -126,8 +127,8 @@ public class YdbRepositoryTransaction<REPO extends YdbRepository>
      */
     @Override
     @ExperimentalApi(issue = "https://github.com/ydb-platform/yoj-project/issues/32")
-    public <T extends Entity<T>> Table<T> table(@NonNull Class<T> clazz, @NonNull String tableName) {
-        return new YdbTable<>(clazz, tableName, this);
+    public <T extends Entity<T>> Table<T> table(@NonNull TableDescriptor<T> descriptor) {
+        return new YdbTable<>(descriptor, this);
     }
 
     @Override

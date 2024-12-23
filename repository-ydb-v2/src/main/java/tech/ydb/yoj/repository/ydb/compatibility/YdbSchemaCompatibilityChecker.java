@@ -52,8 +52,8 @@ public final class YdbSchemaCompatibilityChecker {
     private final List<String> canExecuteMessages = new ArrayList<>();
     private final List<String> incompatibleMessages = new ArrayList<>();
 
-    public YdbSchemaCompatibilityChecker(Map<String, Class<? extends Entity>> entities, YdbRepository repository) {
-        this(entities, repository, Config.DEFAULT);
+    public YdbSchemaCompatibilityChecker(YdbRepository repository, List<TableDescriptor<? extends Entity>> entities) {
+        this(repository, entities, Config.DEFAULT);
     }
 
     public YdbSchemaCompatibilityChecker(List<Class<? extends Entity>> entities, YdbRepository repository) {
@@ -67,8 +67,8 @@ public final class YdbSchemaCompatibilityChecker {
         this.repositoryConfig = this.repository.getConfig();
     }
 
-    public YdbSchemaCompatibilityChecker(Map<String, Class<? extends Entity>> entities, YdbRepository repository, Config config) {
-        this.entities = toDescriptors(entities);
+    public YdbSchemaCompatibilityChecker(YdbRepository repository, List<TableDescriptor<? extends Entity>> entities, Config config) {
+        this.entities = entities;
         this.config = config;
         this.repository = repository;
         this.repositoryConfig = this.repository.getConfig();
@@ -481,12 +481,6 @@ public final class YdbSchemaCompatibilityChecker {
     private static List<TableDescriptor<? extends Entity>> toDescriptors(List<Class<? extends Entity>> entities) {
         List<TableDescriptor<? extends Entity>> descriptors = new ArrayList<>();
         entities.forEach(e -> descriptors.add(TableDescriptor.from(EntitySchema.of(e))));
-        return descriptors;
-    }
-
-    private static List<TableDescriptor<? extends Entity>> toDescriptors(Map<String, Class<? extends Entity>> entities) {
-        List<TableDescriptor<? extends Entity>> descriptors = new ArrayList<>();
-        entities.forEach((n, e) -> descriptors.add(TableDescriptor.from(EntitySchema.of(e), n)));
         return descriptors;
     }
 
