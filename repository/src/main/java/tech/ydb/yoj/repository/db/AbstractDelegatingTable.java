@@ -30,7 +30,8 @@ public abstract class AbstractDelegatingTable<T extends Entity<T>> implements Ta
 
     @ExperimentalApi(issue = "https://github.com/ydb-platform/yoj-project/issues/32")
     protected AbstractDelegatingTable(@NonNull String tableName) {
-        this.target = BaseDb.current(BaseDb.class).table(TableDescriptor.from(EntitySchema.of(resolveEntityType()), tableName));
+        EntitySchema<T> schema = EntitySchema.of(resolveEntityType());
+        this.target = BaseDb.current(BaseDb.class).table(new TableDescriptor<T>(schema.getType(), tableName));
     }
 
     @SuppressWarnings("unchecked")

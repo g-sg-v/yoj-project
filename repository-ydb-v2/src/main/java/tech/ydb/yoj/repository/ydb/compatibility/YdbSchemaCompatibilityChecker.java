@@ -61,10 +61,7 @@ public final class YdbSchemaCompatibilityChecker {
     }
 
     public YdbSchemaCompatibilityChecker(List<Class<? extends Entity>> entities, YdbRepository repository, Config config) {
-        this.entities = toDescriptors(entities);
-        this.config = config;
-        this.repository = repository;
-        this.repositoryConfig = this.repository.getConfig();
+        this(repository, toDescriptors(entities), config);
     }
 
     public YdbSchemaCompatibilityChecker(YdbRepository repository, List<TableDescriptor<? extends Entity>> entities, Config config) {
