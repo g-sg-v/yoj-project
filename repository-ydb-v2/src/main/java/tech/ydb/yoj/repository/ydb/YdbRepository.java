@@ -18,6 +18,7 @@ import tech.ydb.yoj.repository.db.EntitySchema;
 import tech.ydb.yoj.repository.db.Repository;
 import tech.ydb.yoj.repository.db.RepositoryTransaction;
 import tech.ydb.yoj.repository.db.SchemaOperations;
+import tech.ydb.yoj.repository.db.TableDescriptor;
 import tech.ydb.yoj.repository.db.TxOptions;
 import tech.ydb.yoj.repository.ydb.client.SessionManager;
 import tech.ydb.yoj.repository.ydb.client.YdbPaths;
@@ -249,12 +250,12 @@ public class YdbRepository implements Repository {
     }
 
     @Override
-    public <T extends Entity<T>> SchemaOperations<T> schema(Class<T> c) {
-        EntitySchema<T> schema = EntitySchema.of(c);
+    public <T extends Entity<T>> SchemaOperations<T> schema(TableDescriptor<T> descriptor) {
+        EntitySchema<T> schema = EntitySchema.of(descriptor.entityType());
+        String tableName = descriptor.tableName();
         return new SchemaOperations<>() {
             @Override
             public void create() {
-                String tableName = schema.getName();
                 getSchemaOperations().createTable(
                         tableName,
                         schema.flattenFields(),
@@ -264,12 +265,12 @@ public class YdbRepository implements Repository {
                         schema.getTtlModifier(),
                         schema.getChangefeeds()
                 );
-                entityClassesByTableName.put(tableName, c);
+                entityClassesByTableName.put(tableName, descriptor.entityType());
             }
 
             private YdbTableHint extractHint() {
                 try {
-                    Field ydbTableHintField = c.getDeclaredField("ydbTableHint");
+                    Field ydbTableHintField = descriptor.entityType().getDeclaredField("ydbTableHint");
                     ydbTableHintField.setAccessible(true);
                     return (YdbTableHint) ydbTableHintField.get(null);
                 } catch (NoSuchFieldException | IllegalAccessException ignored) {
@@ -279,17 +280,15 @@ public class YdbRepository implements Repository {
 
             @Override
             public void drop() {
-                String tableName = schema.getName();
                 getSchemaOperations().dropTable(tableName);
                 entityClassesByTableName.remove(tableName);
             }
 
             @Override
             public boolean exists() {
-                String tableName = schema.getName();
                 boolean exists = getSchemaOperations().hasTable(tableName);
                 if (exists) {
-                    entityClassesByTableName.put(tableName, c);
+                    entityClassesByTableName.put(tableName, descriptor.entityType());
                 } else {
                     entityClassesByTableName.remove(tableName);
                 }

@@ -6,6 +6,7 @@ import tech.ydb.yoj.repository.db.Entity;
 import tech.ydb.yoj.repository.db.Repository;
 import tech.ydb.yoj.repository.db.RepositoryTransaction;
 import tech.ydb.yoj.repository.db.SchemaOperations;
+import tech.ydb.yoj.repository.db.TableDescriptor;
 import tech.ydb.yoj.repository.db.TxOptions;
 import tech.ydb.yoj.repository.db.exception.DropTableException;
 
@@ -48,25 +49,25 @@ public class InMemoryRepository implements Repository {
     }
 
     @Override
-    public <T extends Entity<T>> SchemaOperations<T> schema(Class<T> c) {
-        return new SchemaOperations<T>() {
+    public <T extends Entity<T>> SchemaOperations<T> schema(TableDescriptor<T> c) {
+        return new SchemaOperations<>() {
             @Override
             public void create() {
-                storage.createTable(c);
+                storage.createTable(c.entityType());
             }
 
             @Override
             public void drop() {
-                if (!storage.dropTable(c)) {
+                if (!storage.dropTable(c.entityType())) {
                     throw new DropTableException(
-                            String.format("Can't drop table %s: table doesn't exist", c.getSimpleName())
+                            String.format("Can't drop table %s: table doesn't exist", c.entityType().getSimpleName())
                     );
                 }
             }
 
             @Override
             public boolean exists() {
-                return storage.containsTable(c);
+                return storage.containsTable(c.entityType());
             }
         };
     }
